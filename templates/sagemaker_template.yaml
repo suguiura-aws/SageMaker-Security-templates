@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Create secure SageMaker Notebook Instance 
+
+Parameters:
+  NotebookInstanceName:
+    Type: String
+  NotebookInstanceType:
+    Type: String
+  NotebookInstanceRoleArn:
+    Type: String
+  SageMakerNotebookSubnet:
+    Type: String
+  SageMakerNotebookSecurityGroup:
+    Type: String
+  KMSKeyArn:
+    Type: String
+  VolumeSize:
+    Description: EBS Volume size in GB
+    Type: Number
+    Default: '10'
+  NotebookOwnerEmail:
+    Description: Notebook owner email address
+    Type: String
+
+Resources:
+  SageMakerNotebookInstance:
+    Type: AWS::SageMaker::NotebookInstance
+    Properties:
+      NotebookInstanceName: !Ref NotebookInstanceName
+      InstanceType: !Ref NotebookInstanceType
+      RoleArn: !Ref NotebookInstanceRoleArn
+      SecurityGroupIds: !Ref SageMakerNotebookSecurityGroup
+      SubnetId: !Ref SageMakerNotebookSubnet
+      DirectInternetAccess: Disabled
+      RootAccess: Disabled
+      VolumeSizeInGB: !Ref VolumeSize
+      KmsKeyId: !Ref KMSKeyArn
+      Tags:
+        Key: NotebookOwnerEmail
+        Value: !Ref NotebookOwnerEmail
+        Key: ProjectName
+        Value: !Sub ${ProjectName}
+
+Outputs:
+        SageMakerNotebookInstance:
+          Value: !Ref SageMakerNotebookInstance

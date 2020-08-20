@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  ProjectName:
+    AllowedPattern: '[A-Za-z0-9-]{1,16}'
+    ConstraintDescription: Maximum of 22 alphanumeric characters. Can include hyphens
+      (-), but not spaces. Must be unique within your account in an AWS Region.
+    Description: SageMaker Notebook instance name
+    MaxLength: '16'
+    MinLength: '1'
+    Type: String
+    Default: project
+
+  NotebookInstanceType:
+    AllowedValues:
+      - ml.t3.medium
+      - ml.t3.large
+      - ml.t3.xlarge
+      - ml.m5.xlarge
+      - ml.m5.2xlarge
+      - ml.m5.4xlarge
+    ConstraintDescription: Must select a valid Nitro notebook instance type.
+    Default: ml.t3.medium
+    Description: Select Instance type for the SageMaker Notebook
+    Type: String
+  VpcCIDR:
+    Type: String
+    Default: 10.2.0.0/16
+  PrivateSubnetCIDR:
+    Type: String
+    Default: 10.2.1.0/24
+  NotebookOwnerEmail:
+    Description: Enter your Notebook owner email address for tagging
+    Type: String
+
+Resources:
+  #================================================================================
+  # SAGEMAKER NOTEBOOK INSTANCE 
+  #================================================================================
+  SAGEMAKER:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        NotebookOwnerEmail: !Sub NotebookOwnerEmail
+        NotebookInstanceName: !Sub ${ProjectName}-notebooks
+        NotebookInstanceType: !Ref NotebookInstanceType
+        NotebookInstanceRoleArn: !GetAtt IAM.Outputs.SageMakerNotebookInstanceRoleArn
+        SageMakerNotebookSubnet: !GetAtt VPC.Outputs.PrivateSubnet
+        SageMakerNotebookSecurityGroup: !GetAtt VPC.Outputs.SecurityGroup
+        KMSKeyArn: !GetAtt IAM.Outputs.KMSKeyArn
+      TemplateURL: https://<REPLACE WITH VALID URL> #TODO
+  #================================================================================
+  # IAM ROLE AND KMS ENCRYPTION KEY 
+  #================================================================================
+  IAM:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        ProjectName: !Ref ProjectName
+        DataBucket: !GetAtt S3.Outputs.DataBucket
+        ModelBucket: !GetAtt S3.Outputs.ModelBucket
+      TemplateURL: https://<REPLACE WITH VALID URL> #TODO
+  #================================================================================
+  # S3 BUCKETS - DATA BUCKET AND MODEL BUCKET 
+  #================================================================================
+  S3:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        ProjectName: !Ref ProjectName
+        DataBucketName: !Sub ${ProjectName}-data-${AWS::AccountId}
+        ModelBucketName: !Sub ${ProjectName}-models-${AWS::AccountId}
+      TemplateURL: https://<RPELACE WITH VALID URL> #TODO
+  #================================================================================
+  # ECR REPOSITORY
+  #================================================================================
+  #ECR:
+  #  Type: AWS::CloudFormation::Stack
+  #  Properties:
+  #    Parameters:
+  #      RepositoryName: !Sub ${ProjectName}-containers
+  #    TemplateURL: https://aws-mlops-workshop.s3-eu-west-1.amazonaws.com/content/control-tower-blog/fine-grain-policies/templates/ecr_template.yaml
+  #================================================================================
+  # VPC WITH A PRIVATE SUBNET AND SECURITY GROUP 
+  #================================================================================
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        ProjectName: !Ref ProjectName
+        VpcCIDR: !Ref VpcCIDR
+        PrivateSubnetCIDR: !Ref PrivateSubnetCIDR
+      TemplateURL: https://<REPLACE WITH VALID URL> #TODO
