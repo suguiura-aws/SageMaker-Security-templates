@@ -6,7 +6,7 @@ Parameters:
     ConstraintDescription: Maximum of 22 alphanumeric characters. Can include hyphens
       (-), but not spaces. Must be unique within your account in an AWS Region.
     Description: SageMaker Notebook instance name
-    MaxLength: '16'
+    MaxLength: '22'
     MinLength: '1'
     Type: String
     Default: project
@@ -41,6 +41,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
+        ProjectName: !Ref ProjectName
         NotebookOwnerEmail: !Sub NotebookOwnerEmail
         NotebookInstanceName: !Sub ${ProjectName}-notebooks
         NotebookInstanceType: !Ref NotebookInstanceType
@@ -48,7 +49,7 @@ Resources:
         SageMakerNotebookSubnet: !GetAtt VPC.Outputs.PrivateSubnet
         SageMakerNotebookSecurityGroup: !GetAtt VPC.Outputs.SecurityGroup
         KMSKeyArn: !GetAtt IAM.Outputs.KMSKeyArn
-      TemplateURL: https://github.com/stefannatu/SageMaker-Security-templates/blob/master/templates/sagemaker_template.yaml
+      TemplateURL:  https://secure-sagemaker-demo-bucket.s3-us-west-2.amazonaws.com/sagemaker_template.yaml 
   #================================================================================
   # IAM ROLE AND KMS ENCRYPTION KEY 
   #================================================================================
@@ -59,7 +60,7 @@ Resources:
         ProjectName: !Ref ProjectName
         DataBucket: !GetAtt S3.Outputs.DataBucket
         ModelBucket: !GetAtt S3.Outputs.ModelBucket
-      TemplateURL: https://github.com/stefannatu/SageMaker-Security-templates/blob/master/templates/iam_template.yaml
+      TemplateURL:  https://secure-sagemaker-demo-bucket.s3-us-west-2.amazonaws.com/iam_template.yaml 
   #================================================================================
   # S3 BUCKETS - DATA BUCKET AND MODEL BUCKET 
   #================================================================================
@@ -70,7 +71,7 @@ Resources:
         ProjectName: !Ref ProjectName
         DataBucketName: !Sub ${ProjectName}-data-${AWS::AccountId}
         ModelBucketName: !Sub ${ProjectName}-models-${AWS::AccountId}
-      TemplateURL: https://github.com/stefannatu/SageMaker-Security-templates/blob/master/templates/s3_template.yaml
+      TemplateURL:  https://secure-sagemaker-demo-bucket.s3-us-west-2.amazonaws.com/s3_template.yaml 
   #================================================================================
   # ECR REPOSITORY
   #================================================================================
@@ -90,4 +91,4 @@ Resources:
         ProjectName: !Ref ProjectName
         VpcCIDR: !Ref VpcCIDR
         PrivateSubnetCIDR: !Ref PrivateSubnetCIDR
-      TemplateURL: https://github.com/stefannatu/SageMaker-Security-templates/blob/master/templates/vpc_template.yaml
+      TemplateURL:  https://secure-sagemaker-demo-bucket.s3-us-west-2.amazonaws.com/vpc_template.yaml 
