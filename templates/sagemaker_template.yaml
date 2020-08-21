@@ -21,6 +21,8 @@ Parameters:
   NotebookOwnerEmail:
     Description: Notebook owner email address
     Type: String
+  ProjectName:
+    Type: String
 
 Resources:
   SageMakerNotebookInstance:
