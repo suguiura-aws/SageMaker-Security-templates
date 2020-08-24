@@ -13,14 +13,13 @@ Parameters:
 
   NotebookInstanceType:
     AllowedValues:
-      - ml.t3.medium
       - ml.t3.large
       - ml.t3.xlarge
       - ml.m5.xlarge
       - ml.m5.2xlarge
       - ml.m5.4xlarge
     ConstraintDescription: Must select a valid Nitro notebook instance type.
-    Default: ml.t3.medium
+    Default: ml.t3.large
     Description: Select Instance type for the SageMaker Notebook
     Type: String
   VpcCIDR:
@@ -39,11 +38,15 @@ Resources:
   #================================================================================
   SAGEMAKER:
     Type: AWS::CloudFormation::Stack
+    DependsOn: 
+      - IAM
+      - VPC
+      - S3
     Properties:
       Parameters:
-        ProjectName: !Ref ProjectName
+        ProjectName: !Sub ${ProjectName}
         NotebookOwnerEmail: !Sub NotebookOwnerEmail
-        NotebookInstanceName: !Sub ${ProjectName}-notebooks
+        NotebookInstanceName: !Sub ${ProjectName}-nb
         NotebookInstanceType: !Ref NotebookInstanceType
         NotebookInstanceRoleArn: !GetAtt IAM.Outputs.SageMakerNotebookInstanceRoleArn
         SageMakerNotebookSubnet: !GetAtt VPC.Outputs.PrivateSubnet
@@ -55,6 +58,7 @@ Resources:
   #================================================================================
   IAM:
     Type: AWS::CloudFormation::Stack
+    DependsOn: S3
     Properties:
       Parameters:
         ProjectName: !Ref ProjectName
@@ -66,6 +70,7 @@ Resources:
   #================================================================================
   S3:
     Type: AWS::CloudFormation::Stack
+    DependsOn: VPC
     Properties:
       Parameters:
         ProjectName: !Ref ProjectName
