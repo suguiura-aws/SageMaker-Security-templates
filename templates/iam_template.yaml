@@ -10,7 +10,7 @@ Parameters:
     Type: String
   KMSAlias:
     Type: String
-    Default: sagemaker-${ProjectName}-notebook-key
+    Default: sagemaker-kms-example
 
 Resources:
   SageMakerNotebookInstanceRole:
@@ -51,7 +51,7 @@ Resources:
                   - cloudwatch:PutMetricAlarm
                   - cloudwatch:DescribeAlarms
                 Resource: '*'
-                - Sid: KMSAccess
+              - Sid: KMSAccess
                 Effect: Allow
                 Action:
                   - kms:CreateGrant'
@@ -99,10 +99,10 @@ Resources:
                   - sagemaker:CreateModel
                   - sagemaker:CreateHyperParameterTuningJob
                 Resource: '*'
-              Effect: Deny
-              Condition:
-              'Null':
-                'sagemaker:VpcSubnets': 'true'
+                Effect: Deny
+                Condition:
+                  'Null':
+                    'sagemaker:VpcSubnets': 'true'
                 Action:
                   - sagemaker:Describe*
                   - sagemaker:List*
@@ -125,7 +125,10 @@ Resources:
 
   KMSKey:
     Type: AWS::KMS::Key
+    Description: Generated KMS Key for sagemaker Notebook's EBS encryption
     Properties:
+      EnableKeyRotation: true
+      Enabled: true
       KeyPolicy:
         Version: 2012-10-17
         Id: allow-root-access-to-key
@@ -159,7 +162,7 @@ Resources:
     Type: AWS::KMS::Alias
     Properties:
       AliasName: !Sub alias/${KMSAlias}
-      TargetKeyId: !Ref KMSKey
+      TargetKeyId: !Ref KMSKey  
 
 
 Outputs:

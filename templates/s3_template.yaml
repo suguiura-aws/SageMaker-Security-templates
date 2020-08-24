@@ -96,7 +96,6 @@ Resources:
                   Fn::ImportValue: 
                     !Sub "ds-s3-endpoint-${ProjectName}-id"
 
-
   ModelBucket:
     Type: AWS::S3::Bucket
     Properties:

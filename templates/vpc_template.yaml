@@ -19,6 +19,8 @@ Resources:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: !Ref VpcCIDR
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
       Tags:
         - Key: Name
           Value: !Sub ${ProjectName}-vpc
@@ -28,6 +30,7 @@ Resources:
     Properties:
       CidrBlock: !Ref PrivateSubnetCIDR
       VpcId: !Ref VPC
+      AvailabilityZone: !Sub  "${AWS::Region}a"
       Tags:
         - Key: Name
           Value: !Sub ${ProjectName}-private-subnet
@@ -95,8 +98,9 @@ Resources:
               "s3:PutObject",
               "s3:ListBucket"
             ],
-            "Resource": [arn:aws:s3:::${ProjectName}-data-${AWS::AccountId},
-            arn:aws:s3:::${ProjectName}-models-${AWS::AccountId}]
+            "Resource": ["arn:aws:s3:::${ProjectName}-data-${AWS::AccountId}",
+            "arn:aws:s3:::${ProjectName}-models-${AWS::AccountId}"
+            ]
           }]
         }
       RouteTableIds:
@@ -121,11 +125,12 @@ Resources:
             Action: '*'
             Resource: '*'
       VpcEndpointType: Interface
+      PrivateDnsEnabled: true
       SubnetIds:
         - !Ref PrivateSubnet
       SecurityGroupIds:
         - !Ref VPCEndpointSecurityGroup
-      ServiceName: !Sub com.amazonaws.${AWS::Region}.sagemaker.api
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.sagemaker.api'
       VpcId: !Ref VPC
 
   VPCEndpointSageMakerRuntime:
@@ -139,11 +144,12 @@ Resources:
             Action: '*'
             Resource: '*'
       VpcEndpointType: Interface
+      PrivateDnsEnabled: true
       SubnetIds:
         - !Ref PrivateSubnet
       SecurityGroupIds:
         - !Ref VPCEndpointSecurityGroup
-      ServiceName: !Sub com.amazonaws.${AWS::Region}.sagemaker.runtime
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.sagemaker.runtime'
       VpcId: !Ref VPC
 
   VPCEndpointSageMakerNotebook:
@@ -157,11 +163,12 @@ Resources:
             Action: '*'
             Resource: '*'
       VpcEndpointType: Interface
+      PrivateDnsEnabled: true
       SubnetIds:
         - !Ref PrivateSubnet
       SecurityGroupIds:
         - !Ref VPCEndpointSecurityGroup
-      ServiceName: !Sub aws.sagemaker.${AWS::Region}.notebook
+      ServiceName: !Sub 'aws.sagemaker.${AWS::Region}.notebook'
       VpcId: !Ref VPC
 
 Outputs:
@@ -170,6 +177,7 @@ Outputs:
   SecurityGroup:
     Value: !Ref SecurityGroup
   S3VPCEndpointId:
-    Value: !Ref VPCEndpointS3Id
+    Description: The ID of the S3 VPC Endpoint
+    Value: !Ref VPCEndpointS3
     Export:
       Name: !Sub "ds-s3-endpoint-${ProjectName}-id"

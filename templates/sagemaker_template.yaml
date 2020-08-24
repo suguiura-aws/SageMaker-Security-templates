@@ -31,17 +31,20 @@ Resources:
       NotebookInstanceName: !Ref NotebookInstanceName
       InstanceType: !Ref NotebookInstanceType
       RoleArn: !Ref NotebookInstanceRoleArn
-      SecurityGroupIds: !Ref SageMakerNotebookSecurityGroup
+      SecurityGroupIds: 
+        - !Ref SageMakerNotebookSecurityGroup     
       SubnetId: !Ref SageMakerNotebookSubnet
       DirectInternetAccess: Disabled
       RootAccess: Disabled
       VolumeSizeInGB: !Ref VolumeSize
       KmsKeyId: !Ref KMSKeyArn
       Tags:
-        Key: NotebookOwnerEmail
-        Value: !Ref NotebookOwnerEmail
-        Key: ProjectName
-        Value: !Sub ${ProjectName}
+        - Key: NotebookOwnerEmail
+          Value: !Ref NotebookOwnerEmail
+        - Key: ProjectName
+          Value: !Ref ProjectName
+        - Key: NotebookInstanceType
+          Value: !Ref NotebookInstanceType
 
 Outputs:
         SageMakerNotebookInstance:
