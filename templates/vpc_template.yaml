@@ -99,7 +99,9 @@ Resources:
               "s3:ListBucket"
             ],
             "Resource": ["arn:aws:s3:::${ProjectName}-data-${AWS::AccountId}",
-            "arn:aws:s3:::${ProjectName}-models-${AWS::AccountId}"
+            "arn:aws:s3:::${ProjectName}-models-${AWS::AccountId}",
+            "arn:aws:s3:::${ProjectName}-data-${AWS::AccountId}/*",
+            "arn:aws:s3:::${ProjectName}-models-${AWS::AccountId}/*"
             ]
           }]
         }
@@ -169,6 +171,25 @@ Resources:
       SecurityGroupIds:
         - !Ref VPCEndpointSecurityGroup
       ServiceName: !Sub 'aws.sagemaker.${AWS::Region}.notebook'
+      VpcId: !Ref VPC
+
+  VPCEndpointSTS:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: '*'
+            Resource: '*'
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnet
+      SecurityGroupIds:
+        - !Ref VPCEndpointSecurityGroup
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.sts'
       VpcId: !Ref VPC
 
 Outputs:
