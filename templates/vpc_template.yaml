@@ -192,6 +192,58 @@ Resources:
       ServiceName: !Sub 'com.amazonaws.${AWS::Region}.sts'
       VpcId: !Ref VPC
 
+  VPCEndpointSSM:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnet
+      SecurityGroupIds:
+        - !Ref VPCEndpointSecurityGroup
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ssm'
+      VpcId: !Ref VPC
+
+  VPCEndpointCW:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: '*'
+            Resource: '*'
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnet
+      SecurityGroupIds:
+        - !Ref VPCEndpointSecurityGroup
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.monitoring'
+      VpcId: !Ref VPC
+
+  VPCEndpointCWL:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: '*'
+            Resource: '*'
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnet
+      SecurityGroupIds:
+        - !Ref VPCEndpointSecurityGroup
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.logs'
+      VpcId: !Ref VPC
+
+
+
 Outputs:
   PrivateSubnet:
     Value: !Ref PrivateSubnet
