@@ -109,9 +109,7 @@ Resources:
               "s3:ListBucket"
             ],
             "Resource": ["arn:aws:s3:::${ProjectName}-data-${AWS::AccountId}",
-            "arn:aws:s3:::${ProjectName}-models-${AWS::AccountId}",
-            "arn:aws:s3:::${ProjectName}-data-${AWS::AccountId}/*",
-            "arn:aws:s3:::${ProjectName}-models-${AWS::AccountId}/*"
+            "arn:aws:s3:::${ProjectName}-data-${AWS::AccountId}/*"
             ]
           }]
         }
